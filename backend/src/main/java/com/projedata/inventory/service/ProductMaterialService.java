@@ -7,7 +7,6 @@ import com.projedata.inventory.entity.RawMaterial;
 import com.projedata.inventory.repository.ProductMaterialRepository;
 import com.projedata.inventory.repository.ProductRepository;
 import com.projedata.inventory.repository.RawMaterialRepository;
-import com.projedata.inventory.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,10 +32,10 @@ public class ProductMaterialService {
     public ProductMaterialDTO create(ProductMaterialDTO dto) {
 
         Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         RawMaterial rawMaterial = rawMaterialRepository.findById(dto.getRawMaterialId())
-                .orElseThrow(() -> new ResourceNotFoundException("Raw material not found"));
+                .orElseThrow(() -> new RuntimeException("Raw material not found"));
 
         ProductMaterial entity = ProductMaterial.builder()
                 .product(product)
@@ -46,7 +45,12 @@ public class ProductMaterialService {
 
         ProductMaterial saved = repository.save(entity);
 
-        return mapToDTO(saved);
+        return ProductMaterialDTO.builder()
+                .id(saved.getId())
+                .productId(saved.getProduct().getId())
+                .rawMaterialId(saved.getRawMaterial().getId())
+                .quantity(saved.getQuantity())
+                .build();
     }
 
     public List<ProductMaterialDTO> findAll() {

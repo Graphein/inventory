@@ -31,48 +31,45 @@ public class ProductionService {
     public Production createProduction(Production production) {
         return productionRepository.save(production);
     }
-
     @Transactional
     public List<ProductionSuggestionDTO> getSuggestions() {
 
-        List<Product> products = productRepository.findAll();
+    List<Product> products = productRepository.findAll();
 
-        return products.stream()
-                .sorted(Comparator.comparing(Product::getPrice).reversed())
-                .map(product -> {
+    return products.stream()
+            .sorted(Comparator.comparing(Product::getPrice).reversed())
+            .map(product -> {
 
-                    int maxProduction = Integer.MAX_VALUE;
+                if (product.getMaterials() == null || product.getMaterials().isEmpty()) {
+                    return null;
+                }
 
-                    if (product.getMaterials() == null || product.getMaterials().isEmpty()) {
-                        return null;
-                    }
+                int maxProduction = Integer.MAX_VALUE;
 
-                    for (ProductMaterial pm : product.getMaterials()) {
+                for (ProductMaterial pm : product.getMaterials()) {
 
-                        int stock = pm.getRawMaterial().getStockQuantity();
-                        double required = pm.getQuantity();
+                    int stock = pm.getRawMaterial().getStockQuantity();
+                    double required = pm.getQuantity();
 
-                        if (required == 0) continue;
+                    if (required <= 0) continue;
 
-                        int possible = (int) (stock / required);
+                    int possible = (int) Math.floor(stock / required);
 
-                        if (possible < maxProduction) {
-                            maxProduction = possible;
-                        }
-                    }
+                    maxProduction = Math.min(maxProduction, possible);
+                }
 
-                    if (maxProduction == Integer.MAX_VALUE) {
-                        maxProduction = 0;
-                    }
+                if (maxProduction == Integer.MAX_VALUE) {
+                    maxProduction = 0;
+                }
 
-                    return ProductionSuggestionDTO.builder()
-                            .productId(product.getId())
-                            .productName(product.getName())
-                            .quantityPossible(maxProduction)
-                            .totalValue(maxProduction * product.getPrice())
-                            .build();
-                })
-                .filter(dto -> dto != null && dto.getQuantityPossible() > 0)
-                .toList();
+                return ProductionSuggestionDTO.builder()
+                        .productId(product.getId())
+                        .productName(product.getName())
+                        .quantityPossible(maxProduction)
+                        .totalValue(maxProduction * product.getPrice())
+                        .build();
+            })
+            .filter(dto -> dto != null && dto.getQuantityPossible() > 0)
+            .toList();
     }
 }
