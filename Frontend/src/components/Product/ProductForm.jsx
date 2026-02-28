@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAllRawMaterials } from '../../api/rawMaterialApi';
+import "../css/ProductForm.css";
 import {
   createProductMaterial,
   getProductMaterialsByProduct,
@@ -92,87 +93,109 @@ const ProductForm = ({ product, onSave, onClose }) => {
     await deleteProductMaterial(id);
     loadLinkedMaterials(product.id);
   };
-
   return (
-    <div className="modal">
-      <form onSubmit={handleSubmit}>
-        <h2>{product ? 'Edit Product' : 'Create Product'}</h2>
+  <div className="pf-overlay">
+    <div className="pf-card">
+      <form onSubmit={handleSubmit} className="pf-form">
+        <h2 className="pf-title">
+          {product ? "Edit Product" : "Create Product"}
+        </h2>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <div className="pf-group">
+          <label>Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          type="number"
-          step="0.01"
-          placeholder="Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          required
-        />
+        <div className="pf-group">
+          <label>Price</label>
+          <input
+            type="number"
+            step="0.01"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          required
-        />
+        <div className="pf-group">
+          <label>Quantity</label>
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            required
+          />
+        </div>
 
-        <button type="submit">Save</button>
+        <div className="pf-actions">
+          <button type="submit" className="pf-save">
+            Save
+          </button>
+          <button type="button" onClick={onClose} className="pf-cancel">
+            Cancel
+          </button>
+        </div>
 
-        {/* Materials Section */}
         {product?.id && (
-          <>
+          <div className="pf-materials">
             <h3>Materials</h3>
 
-            <select
-              value={selectedMaterial}
-              onChange={(e) => setSelectedMaterial(e.target.value)}
-            >
-              <option value="">Select material</option>
-              {rawMaterials.map(m => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
+            <div className="pf-material-inputs">
+              <select
+                value={selectedMaterial}
+                onChange={(e) => setSelectedMaterial(e.target.value)}
+              >
+                <option value="">Select material</option>
+                {rawMaterials.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
 
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Quantity required"
-              value={materialQuantity}
-              onChange={(e) => setMaterialQuantity(e.target.value)}
-            />
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Quantity required"
+                value={materialQuantity}
+                onChange={(e) => setMaterialQuantity(e.target.value)}
+              />
 
-            <button type="button" onClick={handleAddMaterial}>
-              Add Material
-            </button>
+              <button
+                type="button"
+                onClick={handleAddMaterial}
+                className="pf-add"
+              >
+                Add
+              </button>
+            </div>
 
-            <ul>
-              {linkedMaterials.map(m => (
-                <li key={m.id}>
-                  Material ID: {m.rawMaterialId} - Qty: {m.quantity}
+            <div className="pf-material-list">
+              {linkedMaterials.map((m) => (
+                <div key={m.id} className="pf-material-item">
+                  <span>
+                    Material ID: {m.rawMaterialId} - Qty: {m.quantity}
+                  </span>
                   <button
                     type="button"
                     onClick={() => handleDeleteMaterial(m.id)}
+                    className="pf-remove"
                   >
                     Remove
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
-          </>
+            </div>
+          </div>
         )}
-
-        <button type="button" onClick={onClose}>Cancel</button>
       </form>
     </div>
+  </div>
   );
 };
 

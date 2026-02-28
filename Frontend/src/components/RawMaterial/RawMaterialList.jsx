@@ -29,36 +29,77 @@ const RawMaterialList = () => {
   };
 
   return (
-    <div>
-      <h1>Raw Materials</h1>
-      <button onClick={() => { setEditingMaterial(null); setShowForm(true); }}>Create Material</button>
-      {showForm && (
-        <RawMaterialForm
-          rawMaterial={editingMaterial}
-          onSave={handleSave}
-          onClose={() => { setShowForm(false); setEditingMaterial(null); }}
-        />
-      )}
-      <table>
+  <div className="raw-container">
+    <h2 className="raw-title">Raw Materials</h2>
+
+    <button
+      className="create-button"
+      onClick={() => {
+        setEditingMaterial(null);
+        setShowForm(true);
+      }}
+    >
+      + Create Material
+    </button>
+
+    {showForm && (
+      <RawMaterialForm
+        rawMaterial={editingMaterial}
+        onSave={handleSave}
+        onClose={() => {
+          setShowForm(false);
+          setEditingMaterial(null);
+        }}
+      />
+    )}
+
+    <div className="table-wrapper">
+      <table className="raw-table">
         <thead>
           <tr>
-            <th>Name</th><th>Quantity</th><th>Actions</th>
+            <th>Name</th>
+            <th>Stock</th>
+            <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          {materials.map(m => (
-            <tr key={m.id}>
-              <td>{m.name}</td>
-              <td>{m.stockQuantity}</td>
-              <td>
-                <button onClick={() => { setEditingMaterial(m); setShowForm(true); }}>Edit</button>
-                <button onClick={() => handleDelete(m.id)}>Delete</button>
+          {materials.length > 0 ? (
+            materials.map((m) => (
+              <tr key={m.id}>
+                <td>{m.name}</td>
+                <td>{m.stockQuantity}</td>
+                <td className="actions">
+                  <button
+                    className="edit-btn"
+                    onClick={() => {
+                      setEditingMaterial(m);
+                      setShowForm(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(m.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" className="no-data">
+                No materials registered
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
+  </div>
   );
 };
 
