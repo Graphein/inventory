@@ -174,12 +174,15 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 Add
               </button>
             </div>
-
             <div className="pf-material-list">
-              {linkedMaterials.map((m) => (
+            {linkedMaterials.map((m) => {
+              // procura o material pelo id
+              const material = rawMaterials.find(mat => mat.id === m.rawMaterialId);
+
+              return (
                 <div key={m.id} className="pf-material-item">
                   <span>
-                    Material ID: {m.rawMaterialId} - Qty: {m.quantity}
+                    Material: {material ? material.name : 'Unknown'} - Qty: {m.quantity}
                   </span>
                   <button
                     type="button"
@@ -189,7 +192,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
                     Remove
                   </button>
                 </div>
-              ))}
+              );
+            })}
             </div>
           </div>
         )}
