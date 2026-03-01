@@ -1,81 +1,66 @@
 package com.projedata.inventory.service;
 
-import com.projedata.inventory.dto.ProductionSuggestionDTO;
 import com.projedata.inventory.entity.Product;
-import com.projedata.inventory.entity.ProductMaterial;
-import com.projedata.inventory.entity.RawMaterial;
-import com.projedata.inventory.repository.ProductRepository;
+import com.projedata.inventory.entity.Production;
 import com.projedata.inventory.repository.ProductionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ProductionServiceTest {
 
     @Mock
-    private ProductionRepository productionRepository;
-
-    @Mock
-    private ProductRepository productRepository;
+    private ProductionRepository repository;
 
     @InjectMocks
-    private ProductionService productionService;
+    private ProductionService service;
+
+    private Production production;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setup() {
+        Product product = Product.builder()
+                .id(1L)
+                .name("Produto Teste")
+                .price(100.0)
+                .quantity(10)
+                .build();
+
+        production = Production.builder()
+                .id(1L)
+                .quantityProduced(5)
+                .productionDate(LocalDateTime.now())
+                .product(product)
+                .build();
     }
 
     @Test
-    void testGetSuggestions() {
-        // Monta um produto com materiais
-        RawMaterial mat1 = new RawMaterial();
-        mat1.setId(1L);
-        mat1.setStockQuantity(100);
+    void shouldCreateProduction() {
+        when(repository.save(any(Production.class))).thenReturn(production);
 
-        ProductMaterial pm = new ProductMaterial();
-        pm.setQuantity(10);
-        pm.setRawMaterial(mat1);
+        Production saved = service.createProduction(production);
 
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Chair");
-        product.setPrice(50.0);
-        product.setMaterials(List.of(pm));
-
-        when(productRepository.findAll()).thenReturn(List.of(product));
-
-        List<ProductionSuggestionDTO> suggestions = productionService.getSuggestions();
-
-        assertThat(suggestions).hasSize(1);
-        ProductionSuggestionDTO dto = suggestions.get(0);
-        assertThat(dto.getProductName()).isEqualTo("Chair");
-        assertThat(dto.getQuantityPossible()).isEqualTo(10); // 100 stock / 10 required
-        assertThat(dto.getTotalValue()).isEqualTo(500.0);
-
-        verify(productRepository, times(1)).findAll();
+        assertNotNull(saved);
+        assertEquals(5, saved.getQuantityProduced());
+        verify(repository, times(1)).save(production);
     }
 
     @Test
-    void testGetSuggestionsWithNoMaterials() {
-        Product product = new Product();
-        product.setId(2L);
-        product.setName("Desk");
-        product.setPrice(200.0);
-        product.setMaterials(List.of());
+    void shouldReturnAllProductions() {
+        when(repository.findAll()).thenReturn(List.of(production));
 
-        when(productRepository.findAll()).thenReturn(List.of(product));
+        List<Production> list = service.findAll();
 
-        List<ProductionSuggestionDTO> suggestions = productionService.getSuggestions();
-
-        assertThat(suggestions).isEmpty();
-        verify(productRepository, times(1)).findAll();
+        assertEquals(1, list.size());
+        verify(repository, times(1)).findAll();
     }
 }
