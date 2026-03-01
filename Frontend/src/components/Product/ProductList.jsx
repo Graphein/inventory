@@ -12,6 +12,7 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchProducts = () => {
     getAllProducts().then((res) => setProducts(res.data));
@@ -21,8 +22,31 @@ const ProductList = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   const handleDelete = (id) => {
-    deleteProduct(id).then(() => fetchProducts());
+    deleteProduct(id)
+    .then(() => {
+      fetchProducts();
+      setErrorMessage("");
+    })
+    .catch((error) => {
+      if (error.response?.status === 409) {
+        setErrorMessage(
+          "Cannot delete product because it has linked raw materials."
+        );
+      } else {
+        setErrorMessage("Unexpected error while deleting product.");
+      }
+    });
   };
 
   const handleSave = (product) => {
@@ -50,7 +74,11 @@ const ProductList = () => {
       >
         + Create Product
       </button>
-
+      {errorMessage && (
+      <div className="error-message">
+        {errorMessage}
+      </div>
+      )}
       {showForm && (
         <ProductForm
           product={editingProduct}

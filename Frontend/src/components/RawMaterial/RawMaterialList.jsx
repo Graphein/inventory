@@ -6,6 +6,7 @@ const RawMaterialList = () => {
   const [materials, setMaterials] = useState([]);
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchMaterials = () => {
     getAllRawMaterials().then(res => setMaterials(res.data));
@@ -15,8 +16,31 @@ const RawMaterialList = () => {
     fetchMaterials();
   }, []);
 
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   const handleDelete = (id) => {
-    deleteRawMaterial(id).then(() => fetchMaterials());
+    deleteRawMaterial(id)
+      .then(() => {
+        fetchMaterials();
+        setErrorMessage("");
+      })
+      .catch((error) => {
+        if (error.response?.status === 409) {
+          setErrorMessage(
+            "Cannot delete raw material because it is linked to a product."
+          );
+        } else {
+          setErrorMessage("Unexpected error while deleting raw material.");
+        }
+      });
   };
 
   const handleSave = (material) => {
@@ -41,6 +65,11 @@ const RawMaterialList = () => {
     >
       + Create Material
     </button>
+    {errorMessage && (
+      <div className="error-message">
+        {errorMessage}
+      </div>
+    )}
 
     {showForm && (
       <RawMaterialForm
