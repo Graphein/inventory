@@ -38,3 +38,10 @@ Este projeto é uma API RESTful para gerenciamento de estoque, produtos, matéri
    ```bash
    git clone https://github.com/seu-usuario/inventory.git
    cd inventory/backend
+   .\mvnw.cmd clean spring-boot:run
+
+2. FrontEnd
+   ```bash
+   Npm Install
+   Npm start
+   
