@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/product-materials';
+// URL do .env
+const API_URL = process.env.REACT_APP_API_PRODUCT_MATERIALS;
 
 // Criar vínculo entre produto e matéria-prima
 export const createProductMaterial = (data) => {

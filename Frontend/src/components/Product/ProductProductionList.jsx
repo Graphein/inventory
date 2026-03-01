@@ -2,19 +2,20 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../css/ProductProductionList.css";
 
+const API_PRODUCTIONS = process.env.REACT_APP_API_PRODUCTIONS;
+
 const ProductProductionList = () => {
   const [products, setProducts] = useState([]);
 
   const fetchProduction = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/productions/suggestions"
-      );
+      const response = await axios.get(API_PRODUCTIONS);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching production list:", error);
     }
   };
+
 
   useEffect(() => {
     fetchProduction();

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/api/raw-materials";
+// URL do .env
+const API_URL = process.env.REACT_APP_API_RAW_MATERIALS;
 
 export const getAllRawMaterials = () => axios.get(API_URL);
 export const getRawMaterialById = (id) => axios.get(`${API_URL}/${id}`);

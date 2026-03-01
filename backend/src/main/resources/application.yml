@@ -1,9 +1,17 @@
 spring:
+  profiles:
+    active: dev  
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/inventory
     username: postgres
     password: postgres
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -11,3 +19,21 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://dpg-d6hr3gogjchc73ctoutg-a:5432/inventory_db_uasy
+    username: inventory_db_uasy_user
+    password: zdpgBoI3qHNxuvwuQQeOtUADA4J6AVTm
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false   
+    properties:
+      hibernate:
+        format_sql: false
